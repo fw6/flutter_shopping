@@ -38,11 +38,11 @@ class _IndexPageState extends State<IndexPage> {
   ];
 
   int _currentIndex = 0;
-  var _currentPage;
+  // var _currentPage;
 
   void initState() {
     super.initState();
-    _currentPage = tabBodies[_currentIndex];
+    // _currentPage = tabBodies[_currentIndex];
   }
 
   @override
@@ -57,11 +57,14 @@ class _IndexPageState extends State<IndexPage> {
         onTap: (index) {
           setState(() {
             _currentIndex = index;
-            _currentPage = tabBodies[_currentIndex];
+            // _currentPage = tabBodies[_currentIndex];
           });
         },
       ),
-      body: _currentPage,
+      body: IndexedStack(
+        index: _currentIndex,
+        children: tabBodies,
+      ),
     );
   }
 }

@@ -6,3 +6,8 @@ A new Flutter project.
 
 flutter_screenutil
 flutter_swiper
+flutter_easyrefresh
+url_launch
+flutter_provide
+
+## ARIA Attribute
