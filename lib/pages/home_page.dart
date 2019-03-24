@@ -324,7 +324,7 @@ class Recommend extends StatelessWidget {
   // 标题块
   Widget _titleWidget() {
     return Container(
-      height: ScreenUtil().setHeight(60),
+      height: ScreenUtil().setHeight(50),
       alignment: Alignment.centerLeft,
       padding: EdgeInsets.fromLTRB(10, 2, 0, 5),
       decoration: BoxDecoration(
@@ -348,7 +348,7 @@ class Recommend extends StatelessWidget {
     return InkWell(
       onTap: () {},
       child: Container(
-        height: ScreenUtil().setHeight(330),
+        height: ScreenUtil().setHeight(340),
         width: ScreenUtil().setWidth(250),
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -362,8 +362,10 @@ class Recommend extends StatelessWidget {
         ),
         child: Column(
           children: <Widget>[
-            Image.network(
-              recommendList[index]['image'],
+            Expanded(
+              child: Image.network(
+                recommendList[index]['image'],
+              ),
             ),
             Text(
               '￥${recommendList[index]['mallPrice']}',
@@ -401,7 +403,7 @@ class Recommend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: ScreenUtil().setHeight(380),
+      height: ScreenUtil().setHeight(390),
       margin: EdgeInsets.only(top: 10),
       child: Column(
         children: <Widget>[
