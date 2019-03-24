@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_shopping/service/service_methods.dart';
 import 'package:flutter_shopping/model/category.dart';
+import 'package:flutter_shopping/model/category_goods_list.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provide/provide.dart';
 import 'package:flutter_shopping/provide/category_child.dart';
+import 'package:flutter_shopping/provide/category_goods_list.dart';
 
 import 'dart:convert';
 
@@ -28,6 +30,7 @@ class _CategoryPageState extends State<CategoryPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   RightCategoryNav(),
+                  CategoryGoodsList(),
                 ],
               ),
             )
@@ -51,6 +54,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
   void initState() {
     super.initState();
     _getCategory();
+    _getGoodsList();
   }
 
   @override
@@ -58,7 +62,13 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
     return Container(
       width: ScreenUtil().setWidth(180),
       decoration: BoxDecoration(
-          border: Border(right: BorderSide(width: 1, color: Colors.black12))),
+        border: Border(
+          right: BorderSide(
+            width: 1,
+            color: Colors.black12,
+          ),
+        ),
+      ),
       child: ListView.builder(
         itemCount: categoryData.length,
         itemBuilder: (context, index) => _leftInkWell(index),
@@ -69,7 +79,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
   Widget _leftInkWell(int index) {
     bool isClick = false;
 
-    isClick = (index == currentCategoryIndex) && true;
+    isClick = !!(index == currentCategoryIndex) && true;
 
     return InkWell(
       onTap: () {
@@ -78,7 +88,12 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
         });
 
         var childList = categoryData[index].bxMallSubDto;
-        Provide.value<CategoryChild>(context).getCategoryChild(childList);
+        var categoryId = categoryData[index].mallCategoryId;
+
+        Provide.value<CategoryChildProvide>(context)
+            .getCategoryChild(childList);
+
+        _getGoodsList(categoryId: categoryId);
       },
       child: Container(
         height: ScreenUtil().setHeight(100),
@@ -111,8 +126,24 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
         categoryData = list.data;
       });
 
-      Provide.value<CategoryChild>(context)
+      Provide.value<CategoryChildProvide>(context)
           .getCategoryChild(categoryData[0].bxMallSubDto);
+    });
+  }
+
+  void _getGoodsList({String categoryId}) async {
+    var data = {
+      "categoryId": categoryId == null ? 4 : categoryId,
+      "CategorySubId": "",
+      "page": 1
+    };
+
+    await request('getMallGoods', formData: data).then((val) {
+      var data = json.decode(val.toString());
+      CategoryGoodsModel _goodsList = CategoryGoodsModel.fromJson(data);
+
+      Provide.value<CategoryGoodsListProvide>(context)
+          .getGoodsList(_goodsList.data);
     });
   }
 }
@@ -127,7 +158,7 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
   Widget build(BuildContext context) {
     return Provide(
       builder: (context, child, categoryChild) => Container(
-            width: ScreenUtil().setHeight(570),
+            width: ScreenUtil().setWidth(570),
             height: ScreenUtil().setHeight(80),
             decoration: BoxDecoration(
                 color: Colors.white,
@@ -155,6 +186,107 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
             fontSize: ScreenUtil().setSp(28),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class CategoryGoodsList extends StatefulWidget {
+  @override
+  _CategoryGoodsListState createState() => _CategoryGoodsListState();
+}
+
+class _CategoryGoodsListState extends State<CategoryGoodsList> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Provide<CategoryGoodsListProvide>(
+      builder: (context, child, data) => Container(
+            width: ScreenUtil().setWidth(570),
+            height: ScreenUtil().setHeight(1000),
+            child: ListView.builder(
+              itemCount: data.goodsList.length,
+              itemBuilder: (context, index) => _listItem(data.goodsList[index]),
+            ),
+          ),
+    );
+  }
+
+  Widget _listItem(CategoryGoodsData goodsItem) {
+    return InkWell(
+      onTap: () {},
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 5),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            bottom: BorderSide(
+              width: 1.0,
+              color: Colors.black12,
+            ),
+          ),
+        ),
+        child: Row(
+          children: <Widget>[
+            _goodsImage(goodsItem),
+            Column(
+              children: <Widget>[
+                _goodsName(goodsItem),
+                _goodsPrice(goodsItem),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _goodsImage(CategoryGoodsData goodsItem) {
+    return Container(
+      width: ScreenUtil().setWidth(200),
+      child: Image.network(goodsItem.image),
+    );
+  }
+
+  Widget _goodsName(CategoryGoodsData goodsItem) {
+    return Container(
+      padding: EdgeInsets.all(5.0),
+      width: ScreenUtil().setWidth(570),
+      child: Text(
+        goodsItem.goodsName,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: ScreenUtil().setSp(28)),
+      ),
+    );
+  }
+
+  Widget _goodsPrice(CategoryGoodsData goodsItem) {
+    return Container(
+      margin: EdgeInsets.only(top: 20),
+      width: ScreenUtil().setWidth(370),
+      child: Row(
+        children: <Widget>[
+          Text(
+            '价格：￥${goodsItem.presentPrice}',
+            style: TextStyle(
+              color: Colors.pink,
+              fontSize: ScreenUtil().setSp(30),
+            ),
+          ),
+          Text(
+            '价格：￥${goodsItem.oriPrice}',
+            style: TextStyle(
+              color: Colors.black26,
+              fontSize: ScreenUtil().setSp(24),
+              decoration: TextDecoration.lineThrough,
+            ),
+          )
+        ],
       ),
     );
   }

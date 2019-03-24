@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_shopping/model/category.dart';
 
-class CategoryChild with ChangeNotifier {
+class CategoryChildProvide with ChangeNotifier {
   List<CategoryModelDataBxMallSubDto> categoryChildList = [];
 
   getCategoryChild(List<CategoryModelDataBxMallSubDto> list) {
