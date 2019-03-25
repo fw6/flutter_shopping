@@ -30,7 +30,9 @@ class _CategoryPageState extends State<CategoryPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   RightCategoryNav(),
-                  CategoryGoodsList(),
+                  Expanded(
+                    child: CategoryGoodsList(),
+                  )
                 ],
               ),
             )
@@ -91,7 +93,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
         var categoryId = categoryData[index].mallCategoryId;
 
         Provide.value<CategoryChildProvide>(context)
-            .getCategoryChild(childList);
+            .getCategoryChild(childList, categoryId);
 
         _getGoodsList(categoryId: categoryId);
       },
@@ -117,8 +119,8 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
     );
   }
 
-  void _getCategory() async {
-    await request('getCategory').then((val) {
+  void _getCategory() {
+    request('getCategory').then((val) {
       var data = json.decode(val.toString());
       CategoryModel list = CategoryModel.fromJson(data);
 
@@ -126,19 +128,19 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
         categoryData = list.data;
       });
 
-      Provide.value<CategoryChildProvide>(context)
-          .getCategoryChild(categoryData[0].bxMallSubDto);
+      Provide.value<CategoryChildProvide>(context).getCategoryChild(
+          categoryData[0].bxMallSubDto, categoryData[0].mallCategoryId);
     });
   }
 
-  void _getGoodsList({String categoryId}) async {
+  void _getGoodsList({String categoryId}) {
     var data = {
       "categoryId": categoryId == null ? 4 : categoryId,
-      "CategorySubId": "",
+      "categorySubId": "",
       "page": 1
     };
 
-    await request('getMallGoods', formData: data).then((val) {
+    request('getMallGoods', formData: data).then((val) {
       var data = json.decode(val.toString());
       CategoryGoodsModel _goodsList = CategoryGoodsModel.fromJson(data);
 
@@ -156,9 +158,8 @@ class RightCategoryNav extends StatefulWidget {
 class _RightCategoryNavState extends State<RightCategoryNav> {
   @override
   Widget build(BuildContext context) {
-    return Provide(
+    return Provide<CategoryChildProvide>(
       builder: (context, child, categoryChild) => Container(
-            width: ScreenUtil().setWidth(570),
             height: ScreenUtil().setHeight(80),
             decoration: BoxDecoration(
                 color: Colors.white,
@@ -168,26 +169,61 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
               scrollDirection: Axis.horizontal,
               itemCount: categoryChild.categoryChildList.length,
               itemBuilder: (context, index) {
-                return _rightInkWell(categoryChild.categoryChildList[index]);
+                return _rightInkWell(
+                    index, categoryChild.categoryChildList[index]);
               },
             ),
           ),
     );
   }
 
-  Widget _rightInkWell(CategoryModelDataBxMallSubDto item) {
+  Widget _rightInkWell(int index, CategoryModelDataBxMallSubDto item) {
+    bool isClicked = false;
+    isClicked =
+        !!(index == Provide.value<CategoryChildProvide>(context).childIndex) &&
+            true;
+
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Provide.value<CategoryChildProvide>(context)
+            .changeChildIndex(index, item.mallSubId);
+        if (index == 0) {
+          _getGoodsList('');
+        } else {
+          _getGoodsList(item.mallSubId);
+        }
+      },
       child: Container(
-        padding: EdgeInsets.fromLTRB(5, 10, 5, 10),
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Text(
           item.mallSubName,
           style: TextStyle(
             fontSize: ScreenUtil().setSp(28),
+            color: isClicked ? Colors.pink : Colors.black,
           ),
         ),
       ),
     );
+  }
+
+  void _getGoodsList(String categorySubId) {
+    var data = {
+      "categoryId": Provide.value<CategoryChildProvide>(context).categoryId,
+      "categorySubId": categorySubId,
+      "page": 1
+    };
+
+    request('getMallGoods', formData: data).then((val) {
+      var data = json.decode(val.toString());
+      CategoryGoodsModel _goodsList = CategoryGoodsModel.fromJson(data);
+
+      if (_goodsList.data == null) {
+        Provide.value<CategoryGoodsListProvide>(context).getGoodsList([]);
+      } else {
+        Provide.value<CategoryGoodsListProvide>(context)
+            .getGoodsList(_goodsList.data);
+      }
+    });
   }
 }
 
@@ -205,14 +241,18 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
   @override
   Widget build(BuildContext context) {
     return Provide<CategoryGoodsListProvide>(
-      builder: (context, child, data) => Container(
-            width: ScreenUtil().setWidth(570),
-            height: ScreenUtil().setHeight(1000),
+      builder: (context, child, data) {
+        if (data.goodsList.length > 0) {
+          return Container(
             child: ListView.builder(
               itemCount: data.goodsList.length,
               itemBuilder: (context, index) => _listItem(data.goodsList[index]),
             ),
-          ),
+          );
+        }
+
+        return Text('暂时没有数据');
+      },
     );
   }
 
@@ -231,13 +271,19 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
           ),
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             _goodsImage(goodsItem),
-            Column(
-              children: <Widget>[
-                _goodsName(goodsItem),
-                _goodsPrice(goodsItem),
-              ],
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Column(
+                  children: <Widget>[
+                    _goodsName(goodsItem),
+                    _goodsPrice(goodsItem),
+                  ],
+                ),
+              ),
             )
           ],
         ),
@@ -247,15 +293,17 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
 
   Widget _goodsImage(CategoryGoodsData goodsItem) {
     return Container(
-      width: ScreenUtil().setWidth(200),
+      width: ScreenUtil().setWidth(180),
+      height: ScreenUtil().setHeight(190),
+      padding: EdgeInsets.symmetric(horizontal: 6),
       child: Image.network(goodsItem.image),
     );
   }
 
   Widget _goodsName(CategoryGoodsData goodsItem) {
     return Container(
-      padding: EdgeInsets.all(5.0),
-      width: ScreenUtil().setWidth(570),
+      width: ScreenUtil().setWidth(450),
+      padding: EdgeInsets.fromLTRB(0, 5, 5, 5),
       child: Text(
         goodsItem.goodsName,
         maxLines: 2,
@@ -268,23 +316,24 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
   Widget _goodsPrice(CategoryGoodsData goodsItem) {
     return Container(
       margin: EdgeInsets.only(top: 20),
-      width: ScreenUtil().setWidth(370),
       child: Row(
         children: <Widget>[
           Text(
             '价格：￥${goodsItem.presentPrice}',
             style: TextStyle(
               color: Colors.pink,
-              fontSize: ScreenUtil().setSp(30),
+              fontSize: ScreenUtil().setSp(28),
             ),
           ),
           Text(
             '价格：￥${goodsItem.oriPrice}',
             style: TextStyle(
               color: Colors.black26,
-              fontSize: ScreenUtil().setSp(24),
+              fontSize: ScreenUtil().setSp(22),
               decoration: TextDecoration.lineThrough,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           )
         ],
       ),
