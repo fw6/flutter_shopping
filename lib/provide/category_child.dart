@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_shopping/model/category.dart';
 
 class CategoryChildProvide with ChangeNotifier {
@@ -9,14 +10,21 @@ class CategoryChildProvide with ChangeNotifier {
   String categoryId = '4';
   // 小类ID
   String subId = '';
+  // 列表页页数
+  int page = 1;
+  // 无数据文本
+  String noMoreText = '';
 
+  // 切换大类
   getCategoryChild(List<CategoryModelDataBxMallSubDto> list, String id) {
+    page = 1;
+    noMoreText = '';
     childIndex = 0;
     categoryId = id;
     CategoryModelDataBxMallSubDto all = CategoryModelDataBxMallSubDto();
-    all.mallSubId = 'all_data';
     all.mallSubName = '全部';
-    all.mallCategoryId = 'all_data_category_id';
+    all.mallSubId = '';
+    all.mallCategoryId = '';
     all.comments = 'null';
     categoryChildList = [all];
 
@@ -25,9 +33,24 @@ class CategoryChildProvide with ChangeNotifier {
     notifyListeners();
   }
 
-  changeChildIndex(index, id) {
+  // 切换小类
+  changeChildIndex(int index, String id) {
+    page = 1;
+    noMoreText = '';
+
     childIndex = index;
     subId = id;
+    notifyListeners();
+  }
+
+  // 下拉加载
+  addPage() {
+    page++;
+  }
+
+  // 改变 无数据文本
+  changeNoMore(String text) {
+    noMoreText = text;
     notifyListeners();
   }
 }
