@@ -10,6 +10,7 @@ import 'package:flutter_shopping/pages/details_page/details_top.dart';
 import 'package:flutter_shopping/pages/details_page/details_explain.dart';
 import 'package:flutter_shopping/pages/details_page/details_tabbar.dart';
 import 'package:flutter_shopping/pages/details_page/details_web.dart';
+import 'package:flutter_shopping/pages/details_page/details_bottom.dart';
 
 import 'dart:async';
 
@@ -33,15 +34,24 @@ class DetailsPage extends StatelessWidget {
         future: _getBackInfo(context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return Container(
-              child: ListView(
-                children: <Widget>[
-                  DetailsTopArea(),
-                  DetailsExplain(),
-                  DetailsTabbar(),
-                  DetailsWeb(),
-                ],
-              ),
+            return Stack(
+              children: <Widget>[
+                Container(
+                  child: ListView(
+                    children: <Widget>[
+                      DetailsTopArea(),
+                      DetailsExplain(),
+                      DetailsTabbar(),
+                      DetailsWeb(),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  child: DetailsBottom(),
+                )
+              ],
             );
           } else {
             return Center(
