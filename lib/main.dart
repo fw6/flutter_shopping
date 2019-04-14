@@ -7,22 +7,27 @@ import 'package:flutter_shopping/provide/counter.dart';
 import 'package:flutter_shopping/provide/category_child.dart';
 import 'package:flutter_shopping/provide/category_goods_list.dart';
 import 'package:flutter_shopping/provide/details_info.dart';
+import 'package:flutter_shopping/provide/cart.dart';
 import 'package:flutter_shopping/routers/application.dart';
 import 'package:flutter_shopping/routers/routes.dart';
 
 void main() {
   Providers providers = Providers();
   Counter counter = Counter();
-  CategoryChildProvide categoryChild = CategoryChildProvide();
-  CategoryGoodsListProvide categoryGoodsList = CategoryGoodsListProvide();
-  DetailsInfoProvide detailsInfo = DetailsInfoProvide();
+  CategoryChildProvide categoryChildProvide = CategoryChildProvide();
+  CategoryGoodsListProvide categoryGoodsListProvide =
+      CategoryGoodsListProvide();
+  DetailsInfoProvide detailsInfoProvide = DetailsInfoProvide();
+  CartProvide cartProvide = CartProvide();
 
   // 状态放入顶层
   providers
     ..provide(Provider<Counter>.value(counter))
-    ..provide(Provider<CategoryChildProvide>.value(categoryChild))
-    ..provide(Provider<CategoryGoodsListProvide>.value(categoryGoodsList))
-    ..provide(Provider<DetailsInfoProvide>.value(detailsInfo));
+    ..provide(Provider<CategoryChildProvide>.value(categoryChildProvide))
+    ..provide(
+        Provider<CategoryGoodsListProvide>.value(categoryGoodsListProvide))
+    ..provide(Provider<DetailsInfoProvide>.value(detailsInfoProvide))
+    ..provide(Provider<CartProvide>.value(cartProvide));
 
   runApp(
     ProviderNode(

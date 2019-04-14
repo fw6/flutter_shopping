@@ -1,76 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provide/provide.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:async';
 
-class CartPage extends StatefulWidget {
-  @override
-  _CartPageState createState() => _CartPageState();
-}
+import 'package:flutter_shopping/model/cartInfo.dart';
+import 'package:flutter_shopping/provide/cart.dart';
+import 'package:flutter_shopping/pages/cart_page/cart_item.dart';
 
-class _CartPageState extends State<CartPage> {
-  List<String> testList = [];
-
-  void initState() {
-    super.initState();
-    _show();
-  }
-
+class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('购物车'),
+      ),
+      body: Column(
         children: <Widget>[
-          Container(
-            height: 500.0,
-            child: ListView.builder(
-              itemCount: testList.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(testList[index]),
-                );
+          Expanded(
+            child: FutureBuilder(
+              future: _getCartInfo(context),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List<CartInfoModel> cartInfo =
+                      Provide.value<CartProvide>(context).cartList;
+
+                  return ListView.builder(
+                    itemCount: cartInfo.length,
+                    itemBuilder: (context, index) {
+                      return CartItem(cartInfo[index]);
+                    },
+                  );
+                } else {
+                  return Container(
+                    child: Text('no data'),
+                  );
+                }
               },
             ),
           ),
-          RaisedButton(
-            onPressed: _add,
-            child: Icon(Icons.add),
-          ),
-          RaisedButton(
-            onPressed: _clear,
-            child: Icon(Icons.clear),
+          Container(
+            width: ScreenUtil().setWidth(750),
+            height: ScreenUtil().setHeight(200),
+            child: Text('data'),
           ),
         ],
       ),
     );
   }
 
-  // 增加方法
-  void _add() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String temp = 'helko';
+  Future<String> _getCartInfo(BuildContext context) async {
+    await Provide.value<CartProvide>(context).getCartInfo();
 
-    testList.add(temp);
-
-    prefs.setStringList('testInfo', testList);
-  }
-
-  // 查询
-  void _show() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getStringList('testInfo') != null) {
-      setState(() {
-        testList = prefs.getStringList('testInfo');
-      });
-    }
-  }
-
-  // 删除
-  void _clear() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // prefs.clear();
-    prefs.remove('testInfo');
-
-    setState(() {
-      testList = [];
-    });
+    return '完成';
   }
 }

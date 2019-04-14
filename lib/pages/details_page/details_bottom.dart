@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provide/provide.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:flutter_shopping/provide/cart.dart';
+import 'package:flutter_shopping/provide/details_info.dart';
+import 'package:flutter_shopping/routers/application.dart';
+import 'package:flutter_shopping/model/details.dart';
 
 class DetailsBottom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    DetailsModel detailsInfo =
+        Provide.value<DetailsInfoProvide>(context).goodsInfo;
+
     return Container(
       width: ScreenUtil().setWidth(750),
       height: ScreenUtil().setHeight(80),
@@ -12,7 +21,9 @@ class DetailsBottom extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Application.router.navigateTo(context, '/cart');
+            },
             child: Container(
               width: ScreenUtil().setWidth(110),
               alignment: Alignment.center,
@@ -24,7 +35,14 @@ class DetailsBottom extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Provide.value<CartProvide>(context).save(
+                  detailsInfo.data.goodInfo.goodsId,
+                  detailsInfo.data.goodInfo.goodsName,
+                  0,
+                  detailsInfo.data.goodInfo.presentPrice,
+                  detailsInfo.data.goodInfo.image1);
+            },
             child: Container(
               width: ScreenUtil().setWidth(320),
               height: ScreenUtil().setHeight(80),
@@ -39,7 +57,9 @@ class DetailsBottom extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              // TODO: 进入订单详情页
+            },
             child: Container(
               width: ScreenUtil().setWidth(320),
               height: ScreenUtil().setHeight(80),

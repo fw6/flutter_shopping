@@ -5,7 +5,8 @@ import 'package:flutter_shopping/routers/router_handler.dart';
 
 class Routes {
   static String root = '/';
-  static String detailsPage = '/detail';
+  static String detailsPage = '/detail'; // 商品详情
+  static String cartPage = '/cart'; // 购物车
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = new Handler(
@@ -18,5 +19,6 @@ class Routes {
     });
 
     router.define(detailsPage, handler: detailsHandler);
+    router.define(cartPage, handler: cartHandler);
   }
 }
