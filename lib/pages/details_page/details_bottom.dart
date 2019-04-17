@@ -35,11 +35,11 @@ class DetailsBottom extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: () {
-              Provide.value<CartProvide>(context).save(
+            onTap: () async {
+              await Provide.value<CartProvide>(context).save(
                   detailsInfo.data.goodInfo.goodsId,
                   detailsInfo.data.goodInfo.goodsName,
-                  0,
+                  1,
                   detailsInfo.data.goodInfo.presentPrice,
                   detailsInfo.data.goodInfo.image1);
             },

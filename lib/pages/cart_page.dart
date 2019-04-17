@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_shopping/pages/cart_page/cart_bottom.dart';
 import 'package:provide/provide.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:async';
 
 import 'package:flutter_shopping/model/cartInfo.dart';
@@ -11,41 +11,45 @@ class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('购物车'),
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: FutureBuilder(
-              future: _getCartInfo(context),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List<CartInfoModel> cartInfo =
-                      Provide.value<CartProvide>(context).cartList;
+        appBar: AppBar(
+          title: Text('购物车'),
+        ),
+        body: FractionallySizedBox(
+          widthFactor: 1.0,
+          child: FutureBuilder(
+            future: _getCartInfo(context),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List<CartInfoModel> cartInfo =
+                    Provide.value<CartProvide>(context).cartList;
 
-                  return ListView.builder(
-                    itemCount: cartInfo.length,
-                    itemBuilder: (context, index) {
-                      return CartItem(cartInfo[index]);
-                    },
-                  );
-                } else {
-                  return Container(
-                    child: Text('no data'),
-                  );
-                }
-              },
-            ),
+                return Stack(
+                  children: <Widget>[
+                    Provide<CartProvide>(
+                      builder: (context, child, val) {
+                        return ListView.builder(
+                          itemCount: cartInfo.length,
+                          itemBuilder: (context, index) {
+                            return CartItem(cartInfo[index]);
+                          },
+                        );
+                      },
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      child: CartBottom(),
+                    )
+                  ],
+                );
+              } else {
+                return Container(
+                  child: Text('no data'),
+                );
+              }
+            },
           ),
-          Container(
-            width: ScreenUtil().setWidth(750),
-            height: ScreenUtil().setHeight(200),
-            child: Text('data'),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 
   Future<String> _getCartInfo(BuildContext context) async {

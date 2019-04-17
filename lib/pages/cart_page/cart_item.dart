@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_shopping/model/cartInfo.dart';
+import 'package:flutter_shopping/pages/cart_page/cart_count.dart';
+import 'package:flutter_shopping/provide/cart.dart';
+import 'package:provide/provide.dart';
 
 class CartItem extends StatelessWidget {
   final CartInfoModel _cartInfoItem;
@@ -21,20 +24,20 @@ class CartItem extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          _cartCheckButton(),
-          _cartImage(),
-          _cartGoodsName(),
-          _cartPrice(),
+          _cartCheckButton,
+          _cartImage,
+          _cartGoodsName,
+          _cartPrice(context),
         ],
       ),
     );
   }
 
   // 选中按钮
-  Widget _cartCheckButton() {
+  Widget get _cartCheckButton {
     return Container(
       child: Checkbox(
-        value: true,
+        value: _cartInfoItem.isChecked,
         activeColor: Colors.pink,
         onChanged: (bool val) {},
       ),
@@ -42,7 +45,7 @@ class CartItem extends StatelessWidget {
   }
 
   // 商品图片
-  Widget _cartImage() {
+  Widget get _cartImage {
     return Container(
       width: ScreenUtil().setWidth(150),
       padding: EdgeInsets.all(3.0),
@@ -53,21 +56,19 @@ class CartItem extends StatelessWidget {
   }
 
   // 商品价格
-  Widget _cartGoodsName() {
+  Widget get _cartGoodsName {
     return Container(
       width: ScreenUtil().setWidth(300),
       padding: EdgeInsets.all(10),
       alignment: Alignment.topLeft,
       child: Column(
-        children: <Widget>[
-          Text(_cartInfoItem.goodsName),
-        ],
+        children: <Widget>[Text(_cartInfoItem.goodsName), CartCount()],
       ),
     );
   }
 
   // 商品价格
-  Widget _cartPrice() {
+  Widget _cartPrice(BuildContext context) {
     return Container(
       width: ScreenUtil().setWidth(150),
       alignment: Alignment.centerRight,
@@ -76,7 +77,10 @@ class CartItem extends StatelessWidget {
           Text('￥${_cartInfoItem.price}'),
           Container(
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                Provide.value<CartProvide>(context)
+                    .delete(_cartInfoItem.goodsId);
+              },
               child: Icon(
                 Icons.delete_forever,
                 color: Colors.black26,

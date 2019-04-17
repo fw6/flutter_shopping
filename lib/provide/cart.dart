@@ -37,6 +37,7 @@ class CartProvide with ChangeNotifier {
         'count': count,
         'price': price,
         'images': images,
+        'isChecked': true
       };
 
       tempList.add(newGoods);
@@ -75,5 +76,27 @@ class CartProvide with ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  delete(String goodsId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    cartString = prefs.getString('cartInfo');
+    List<Map> tempList = (json.decode(cartString.toString()) as List).cast();
+
+    int delIndex = 0;
+    int tempIndex = 0;
+
+    tempList.map((item) {
+      if (item['goodsId'] == goodsId) {
+        delIndex = tempIndex;
+      }
+      tempIndex++;
+    });
+
+    tempList.removeAt(delIndex);
+    cartString = json.encode(tempList).toString();
+    prefs.setString('cartInfo', cartString);
+
+    await getCartInfo();
   }
 }
