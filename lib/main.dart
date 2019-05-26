@@ -8,6 +8,8 @@ import 'package:flutter_shopping/provide/category_child.dart';
 import 'package:flutter_shopping/provide/category_goods_list.dart';
 import 'package:flutter_shopping/provide/details_info.dart';
 import 'package:flutter_shopping/provide/cart.dart';
+import 'package:flutter_shopping/provide/current_index.dart';
+
 import 'package:flutter_shopping/routers/application.dart';
 import 'package:flutter_shopping/routers/routes.dart';
 
@@ -19,6 +21,7 @@ void main() {
       CategoryGoodsListProvide();
   DetailsInfoProvide detailsInfoProvide = DetailsInfoProvide();
   CartProvide cartProvide = CartProvide();
+  CurrentIndexProvider currentIndexProvide = CurrentIndexProvider();
 
   // 状态放入顶层
   providers
@@ -27,7 +30,8 @@ void main() {
     ..provide(
         Provider<CategoryGoodsListProvide>.value(categoryGoodsListProvide))
     ..provide(Provider<DetailsInfoProvide>.value(detailsInfoProvide))
-    ..provide(Provider<CartProvide>.value(cartProvide));
+    ..provide(Provider<CartProvide>.value(cartProvide))
+    ..provide(Provider<CurrentIndexProvider>.value(currentIndexProvide));
 
   runApp(
     ProviderNode(

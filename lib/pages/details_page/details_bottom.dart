@@ -4,7 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_shopping/provide/cart.dart';
 import 'package:flutter_shopping/provide/details_info.dart';
-import 'package:flutter_shopping/routers/application.dart';
+import 'package:flutter_shopping/provide/current_index.dart';
+// import 'package:flutter_shopping/routers/application.dart';
 import 'package:flutter_shopping/model/details.dart';
 
 class DetailsBottom extends StatelessWidget {
@@ -20,19 +21,50 @@ class DetailsBottom extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          InkWell(
-            onTap: () {
-              Application.router.navigateTo(context, '/cart');
-            },
-            child: Container(
-              width: ScreenUtil().setWidth(110),
-              alignment: Alignment.center,
-              child: Icon(
-                Icons.shopping_cart,
-                size: 35,
-                color: Colors.red,
+          Stack(
+            children: <Widget>[
+              InkWell(
+                onTap: () {
+                  Provide.value<CurrentIndexProvider>(context).changeIndex(2);
+                  // Application.router.navigateTo(context, '/cart');
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  width: ScreenUtil().setWidth(110),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.shopping_cart,
+                    size: 35,
+                    color: Colors.red,
+                  ),
+                ),
               ),
-            ),
+              Provide<CartProvide>(
+                builder: (context, child, val) {
+                  int count = Provide.value<CartProvide>(context).count;
+
+                  return Positioned(
+                    top: 0,
+                    right: 10,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.pinkAccent,
+                        border: Border.all(width: 2, color: Colors.white),
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: Text(
+                        count.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil().setSp(22),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
           InkWell(
             onTap: () async {
@@ -57,9 +89,7 @@ class DetailsBottom extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: () {
-              // TODO: 进入订单详情页
-            },
+            onTap: () {},
             child: Container(
               width: ScreenUtil().setWidth(320),
               height: ScreenUtil().setHeight(80),

@@ -184,3 +184,16 @@ class RadicalExpansionDemo extends StatelessWidget {
 4. 控制台
 
 ## ARIA Attribute
+
+### 状态保持
+```dart
+class DemoState extends State<DemoPage> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  Widget build(BuildContext context) {
+    super.build(context);
+  }
+
+}
+```
